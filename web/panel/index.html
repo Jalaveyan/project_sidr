@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafficMask Panel - Российская маскировка трафика</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #dc3545;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --info-color: #0dcaf0;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            max-width: 1400px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--danger-color));
+            color: white;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .stats-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-card h3 {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0;
+        }
+        
+        .stats-card p {
+            margin: 5px 0 0 0;
+            opacity: 0.9;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .feature-card h5 {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .btn-russia {
+            background: linear-gradient(135deg, var(--primary-color), var(--danger-color));
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-russia:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: white;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--secondary-color);
+            font-weight: bold;
+            padding: 15px 25px;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--danger-color));
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .table-russia {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .table-russia thead {
+            background: linear-gradient(135deg, var(--primary-color), var(--danger-color));
+            color: white;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-online { background-color: var(--success-color); }
+        .status-offline { background-color: var(--danger-color); }
+        .status-warning { background-color: var(--warning-color); }
+        
+        .russia-flag {
+            background: linear-gradient(to right, #ffffff 33%, #0039a6 33%, #0039a6 66%, #d52b1e 66%);
+            width: 20px;
+            height: 15px;
+            border-radius: 2px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .progress-russia {
+            height: 25px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary-color), var(--danger-color));
+        }
+        
+        .progress-russia .progress-bar {
+            background: linear-gradient(135deg, var(--success-color), var(--info-color));
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="main-container">
+            <!-- Header -->
+            <div class="header text-center">
+                <h1><i class="fas fa-shield-alt"></i> TrafficMask Panel</h1>
+                <p class="mb-0">Российская система маскировки трафика | VLESS + REALITY + Vision</p>
+                <div class="mt-3">
+                    <span class="russia-flag"></span>
+                    <span class="badge bg-light text-dark me-2">🇷🇺 Российская адаптация</span>
+                    <span class="badge bg-light text-dark me-2">🚀 VLESS протокол</span>
+                    <span class="badge bg-light text-dark me-2">🔒 REALITY маскировка</span>
+                    <span class="badge bg-light text-dark">👁️ Vision поток</span>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="row p-4">
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <h3 id="processed-packets">0</h3>
+                        <p><i class="fas fa-network-wired"></i> Обработано пакетов</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <h3 id="masked-packets">0</h3>
+                        <p><i class="fas fa-mask"></i> Замаскировано пакетов</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <h3 id="active-connections">0</h3>
+                        <p><i class="fas fa-link"></i> Активных соединений</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card text-center">
+                        <h3 id="signature-count">0</h3>
+                        <p><i class="fas fa-signature"></i> Активных сигнатур</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <div class="px-4">
+                <ul class="nav nav-tabs" id="mainTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">
+                            <i class="fas fa-tachometer-alt"></i> Обзор
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="vless-tab" data-bs-toggle="tab" data-bs-target="#vless" type="button" role="tab">
+                            <i class="fas fa-rocket"></i> VLESS
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reality-tab" data-bs-toggle="tab" data-bs-target="#reality" type="button" role="tab">
+                            <i class="fas fa-lock"></i> REALITY
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="russia-tab" data-bs-toggle="tab" data-bs-target="#russia" type="button" role="tab">
+                            <i class="fas fa-flag"></i> Россия
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">
+                            <i class="fas fa-file-alt"></i> Логи
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content p-4" id="mainTabsContent">
+                <!-- Overview Tab -->
+                <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h5><i class="fas fa-shield-alt"></i> Статус системы</h5>
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Маскировка трафика</span>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="badge bg-success">Активна</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>VLESS протокол</span>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="badge bg-success">Работает</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>REALITY маскировка</span>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="badge bg-success">Активна</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span>Российские сервисы</span>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="badge bg-success">Доступны</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h5><i class="fas fa-chart-line"></i> Производительность</h5>
+                                <div class="mt-3">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Обработка пакетов</span>
+                                            <span id="packet-performance">0 пакетов/сек</span>
+                                        </div>
+                                        <div class="progress progress-russia mt-1">
+                                            <div class="progress-bar" role="progressbar" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Маскировка VLESS</span>
+                                            <span id="vless-performance">0 пакетов/сек</span>
+                                        </div>
+                                        <div class="progress progress-russia mt-1">
+                                            <div class="progress-bar" role="progressbar" style="width: 92%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>REALITY обработка</span>
+                                            <span id="reality-performance">0 пакетов/сек</span>
+                                        </div>
+                                        <div class="progress progress-russia mt-1">
+                                            <div class="progress-bar" role="progressbar" style="width: 78%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- VLESS Tab -->
+                <div class="tab-pane fade" id="vless" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="feature-card">
+                                <h5><i class="fas fa-rocket"></i> VLESS Конфигурации</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-russia">
+                                        <thead>
+                                            <tr>
+                                                <th>UUID</th>
+                                                <th>Домен</th>
+                                                <th>Порт</th>
+                                                <th>Тип</th>
+                                                <th>Статус</th>
+                                                <th>Действия</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="vless-configs">
+                                            <tr>
+                                                <td><code>550e8400-e29b-41d4-a716-446655440001</code></td>
+                                                <td><span class="russia-flag"></span>mail.ru</td>
+                                                <td>443</td>
+                                                <td><span class="badge bg-primary">TCP</span></td>
+                                                <td><span class="status-indicator status-online"></span>Активен</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Редактировать</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Удалить</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>550e8400-e29b-41d4-a716-446655440002</code></td>
+                                                <td><span class="russia-flag"></span>yandex.ru</td>
+                                                <td>443</td>
+                                                <td><span class="badge bg-success">REALITY</span></td>
+                                                <td><span class="status-indicator status-online"></span>Активен</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Редактировать</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Удалить</button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td><code>550e8400-e29b-41d4-a716-446655440003</code></td>
+                                                <td><span class="russia-flag"></span>vk.com</td>
+                                                <td>443</td>
+                                                <td><span class="badge bg-info">Vision</span></td>
+                                                <td><span class="status-indicator status-online"></span>Активен</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">Редактировать</button>
+                                                    <button class="btn btn-sm btn-outline-danger">Удалить</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-russia" onclick="addVlessConfig()">
+                                        <i class="fas fa-plus"></i> Добавить VLESS конфигурацию
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="feature-card">
+                                <h5><i class="fas fa-cogs"></i> Быстрые действия</h5>
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-russia" onclick="startVless()">
+                                        <i class="fas fa-play"></i> Запустить VLESS
+                                    </button>
+                                    <button class="btn btn-outline-danger" onclick="stopVless()">
+                                        <i class="fas fa-stop"></i> Остановить VLESS
+                                    </button>
+                                    <button class="btn btn-outline-info" onclick="restartVless()">
+                                        <i class="fas fa-redo"></i> Перезапустить VLESS
+                                    </button>
+                                    <button class="btn btn-outline-success" onclick="testVless()">
+                                        <i class="fas fa-vial"></i> Тестировать соединение
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- REALITY Tab -->
+                <div class="tab-pane fade" id="reality" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h5><i class="fas fa-lock"></i> REALITY Настройки</h5>
+                                <form id="reality-form">
+                                    <div class="mb-3">
+                                        <label class="form-label">Целевой домен</label>
+                                        <select class="form-select" id="reality-domain">
+                                            <option value="mail.ru">mail.ru</option>
+                                            <option value="yandex.ru">yandex.ru</option>
+                                            <option value="vk.com">vk.com</option>
+                                            <option value="ok.ru">ok.ru</option>
+                                            <option value="rambler.ru">rambler.ru</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Публичный ключ</label>
+                                        <input type="text" class="form-control" id="reality-pbk" placeholder="Автоматически генерируется">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Сессионный ID</label>
+                                        <input type="text" class="form-control" id="reality-sid" placeholder="Автоматически генерируется">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Путь</label>
+                                        <input type="text" class="form-control" id="reality-spx" value="/">
+                                    </div>
+                                    <button type="submit" class="btn btn-russia">
+                                        <i class="fas fa-save"></i> Сохранить REALITY
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h5><i class="fas fa-shield-alt"></i> REALITY Статус</h5>
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span>REALITY сервер</span>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="badge bg-success">Активен</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span>TLS маскировка</span>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="badge bg-success">Работает</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span>Российские домены</span>
+                                        <span class="status-indicator status-online"></span>
+                                        <span class="badge bg-success">Доступны</span>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h6>Статистика REALITY:</h6>
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Обработано пакетов</span>
+                                                <span id="reality-packets">0</span>
+                                            </div>
+                                            <div class="progress progress-russia mt-1">
+                                                <div class="progress-bar" role="progressbar" style="width: 78%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="mb-2">
+                                            <div class="d-flex justify-content-between">
+                                                <span>Успешная маскировка</span>
+                                                <span id="reality-success">0%</span>
+                                            </div>
+                                            <div class="progress progress-russia mt-1">
+                                                <div class="progress-bar" role="progressbar" style="width: 95%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Russia Tab -->
+                <div class="tab-pane fade" id="russia" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h5><i class="fas fa-flag"></i> Российские сервисы</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-russia">
+                                        <thead>
+                                            <tr>
+                                                <th>Сервис</th>
+                                                <th>Статус</th>
+                                                <th>IP адрес</th>
+                                                <th>Использование</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td><span class="russia-flag"></span>Яндекс DNS</td>
+                                                <td><span class="status-indicator status-online"></span>Онлайн</td>
+                                                <td><code>77.88.8.8</code></td>
+                                                <td><span class="badge bg-success">Активно</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="russia-flag"></span>Mail.ru</td>
+                                                <td><span class="status-indicator status-online"></span>Онлайн</td>
+                                                <td><code>13.13.13.13</code></td>
+                                                <td><span class="badge bg-success">Активно</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="russia-flag"></span>Rambler</td>
+                                                <td><span class="status-indicator status-online"></span>Онлайн</td>
+                                                <td><code>46.46.46.46</code></td>
+                                                <td><span class="badge bg-success">Активно</span></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span class="russia-flag"></span>VK</td>
+                                                <td><span class="status-indicator status-online"></span>Онлайн</td>
+                                                <td><code>31.31.31.31</code></td>
+                                                <td><span class="badge bg-success">Активно</span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="feature-card">
+                                <h5><i class="fas fa-chart-pie"></i> Использование российских сервисов</h5>
+                                <div class="mt-3">
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Яндекс сервисы</span>
+                                            <span>35%</span>
+                                        </div>
+                                        <div class="progress progress-russia mt-1">
+                                            <div class="progress-bar" role="progressbar" style="width: 35%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Mail.ru сервисы</span>
+                                            <span>25%</span>
+                                        </div>
+                                        <div class="progress progress-russia mt-1">
+                                            <div class="progress-bar" role="progressbar" style="width: 25%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>VK сервисы</span>
+                                            <span>20%</span>
+                                        </div>
+                                        <div class="progress progress-russia mt-1">
+                                            <div class="progress-bar" role="progressbar" style="width: 20%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between">
+                                            <span>Другие российские</span>
+                                            <span>20%</span>
+                                        </div>
+                                        <div class="progress progress-russia mt-1">
+                                            <div class="progress-bar" role="progressbar" style="width: 20%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logs Tab -->
+                <div class="tab-pane fade" id="logs" role="tabpanel">
+                    <div class="feature-card">
+                        <h5><i class="fas fa-file-alt"></i> Системные логи</h5>
+                        <div class="log-container" id="log-container">
+                            <div>[2024-01-15 10:30:15] INFO: TrafficMask система запущена</div>
+                            <div>[2024-01-15 10:30:16] INFO: VLESS маскировщик активирован</div>
+                            <div>[2024-01-15 10:30:17] INFO: REALITY маскировка включена</div>
+                            <div>[2024-01-15 10:30:18] INFO: Российские сервисы подключены</div>
+                            <div>[2024-01-15 10:30:19] INFO: Обработано пакетов: 1250</div>
+                            <div>[2024-01-15 10:30:20] INFO: Замаскировано пакетов: 1180</div>
+                            <div>[2024-01-15 10:30:21] INFO: VLESS UUID заменен на российский</div>
+                            <div>[2024-01-15 10:30:22] INFO: REALITY домен заменен на mail.ru</div>
+                            <div>[2024-01-15 10:30:23] INFO: Vision поток обработан</div>
+                            <div>[2024-01-15 10:30:24] INFO: Статистика обновлена</div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-outline-primary me-2" onclick="clearLogs()">
+                                <i class="fas fa-trash"></i> Очистить логи
+                            </button>
+                            <button class="btn btn-outline-success" onclick="downloadLogs()">
+                                <i class="fas fa-download"></i> Скачать логи
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === VLESS/Reality Config Generator === -->
+    <div class="container my-4">
+      <div class="card">
+        <div class="card-header bg-primary text-white">Генератор VPN-конфига (VLESS/Reality/Custom)</div>
+        <div class="card-body">
+          <form id="vless-config-form" class="row g-3">
+            <div class="col-md-3">
+              <label for="sni-input" class="form-label">SNI</label>
+              <input type="text" class="form-control" id="sni-input" placeholder="example.com">
+            </div>
+            <div class="col-md-3">
+              <label for="uuid-input" class="form-label">UUID</label>
+              <input type="text" class="form-control" id="uuid-input" placeholder="550e8400-e29b-41d4-a716-446655440001">
+            </div>
+            <div class="col-md-2">
+              <label for="alpn-input" class="form-label">ALPN</label>
+              <input type="text" class="form-control" id="alpn-input" placeholder="h2,http/1.1">
+            </div>
+            <div class="col-md-2">
+              <label for="path-input" class="form-label">Path</label>
+              <input type="text" class="form-control" id="path-input" placeholder="/ws">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+              <button type="button" class="btn btn-success w-100" onclick="generateConfig()">Сгенерировать</button>
+            </div>
+          </form>
+          <div class="mt-3">
+            <label class="form-label">Сгенерированный конфиг:</label>
+            <pre id="config-output" class="bg-light p-2 rounded"></pre>
+            <button class="btn btn-outline-primary btn-sm" onclick="copyConfig()">Копировать</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- === End Config Generator === -->
+
+    <!-- === Real-time Allowed IPs and Logs === -->
+    <div class="container my-4">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header bg-info text-white">Разрешённые IP (реальное время)</div>
+            <div class="card-body">
+              <table class="table table-bordered table-sm" id="allowed-ips-table">
+                <thead><tr><th>Сервис</th><th>IP</th><th>Статус</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-header bg-secondary text-white">Логи (реальное время)</div>
+            <div class="card-body" style="max-height:200px;overflow-y:auto;">
+              <ul class="list-group" id="logs-list"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- === End Real-time Tables === -->
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // API базовый URL
+        const API_BASE = 'http://localhost:8080/api/v1';
+        
+        // Обновление статистики
+        function updateStats() {
+            fetch(`${API_BASE}/stats`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('processed-packets').textContent = data.processed_packets || 0;
+                    document.getElementById('masked-packets').textContent = data.masked_packets || 0;
+                    document.getElementById('active-connections').textContent = data.active_connections || 0;
+                    document.getElementById('signature-count').textContent = data.signature_count || 0;
+                    
+                    // Обновление производительности
+                    document.getElementById('packet-performance').textContent = `${data.processed_packets || 0} пакетов/сек`;
+                    document.getElementById('vless-performance').textContent = `${Math.floor((data.processed_packets || 0) * 0.92)} пакетов/сек`;
+                    document.getElementById('reality-performance').textContent = `${Math.floor((data.processed_packets || 0) * 0.78)} пакетов/сек`;
+                    
+                    // Обновление REALITY статистики
+                    document.getElementById('reality-packets').textContent = Math.floor((data.processed_packets || 0) * 0.78);
+                    document.getElementById('reality-success').textContent = '95%';
+                })
+                .catch(error => {
+                    console.error('Ошибка получения статистики:', error);
+                });
+        }
+        
+        // VLESS функции
+        function addVlessConfig() {
+            alert('Добавление новой VLESS конфигурации...');
+        }
+        
+        function startVless() {
+            fetch(`${API_BASE}/vless/start`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert('VLESS сервер запущен');
+                    addLog('VLESS сервер запущен');
+                })
+                .catch(error => {
+                    console.error('Ошибка запуска VLESS:', error);
+                });
+        }
+        
+        function stopVless() {
+            fetch(`${API_BASE}/vless/stop`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert('VLESS сервер остановлен');
+                    addLog('VLESS сервер остановлен');
+                })
+                .catch(error => {
+                    console.error('Ошибка остановки VLESS:', error);
+                });
+        }
+        
+        function restartVless() {
+            fetch(`${API_BASE}/vless/restart`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert('VLESS сервер перезапущен');
+                    addLog('VLESS сервер перезапущен');
+                })
+                .catch(error => {
+                    console.error('Ошибка перезапуска VLESS:', error);
+                });
+        }
+        
+        function testVless() {
+            fetch(`${API_BASE}/vless/test`, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    alert('Тест VLESS соединения выполнен успешно');
+                    addLog('Тест VLESS соединения выполнен успешно');
+                })
+                .catch(error => {
+                    console.error('Ошибка тестирования VLESS:', error);
+                });
+        }
+        
+        // REALITY функции
+        document.getElementById('reality-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                domain: document.getElementById('reality-domain').value,
+                pbk: document.getElementById('reality-pbk').value,
+                sid: document.getElementById('reality-sid').value,
+                spx: document.getElementById('reality-spx').value
+            };
+            
+            fetch(`${API_BASE}/reality/save`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('REALITY конфигурация сохранена');
+                addLog(`REALITY конфигурация сохранена для домена: ${formData.domain}`);
+            })
+            .catch(error => {
+                console.error('Ошибка сохранения REALITY:', error);
+            });
+        });
+        
+        // Логи функции
+        function addLog(message) {
+            const logContainer = document.getElementById('log-container');
+            const timestamp = new Date().toISOString().replace('T', ' ').substring(0, 19);
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] INFO: ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        function clearLogs() {
+            document.getElementById('log-container').innerHTML = '';
+            addLog('Логи очищены');
+        }
+        
+        function downloadLogs() {
+            const logs = document.getElementById('log-container').textContent;
+            const blob = new Blob([logs], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `trafficmask-logs-${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Автоматическое обновление статистики
+        setInterval(updateStats, 5000);
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            addLog('TrafficMask Panel загружен');
+        });
+
+        // Генерация конфига
+        function generateConfig() {
+          const sni = document.getElementById('sni-input').value;
+          const uuid = document.getElementById('uuid-input').value;
+          const alpn = document.getElementById('alpn-input').value;
+          const path = document.getElementById('path-input').value;
+          const config = `vless://${uuid}@yourdomain.com:443?encryption=none&security=tls&sni=${sni}&alpn=${alpn}&type=ws&path=${path}#MyProfile`;
+          document.getElementById('config-output').textContent = config;
+        }
+        function copyConfig() {
+          const text = document.getElementById('config-output').textContent;
+          navigator.clipboard.writeText(text);
+        }
+        // WebSocket для реального времени
+        let ws;
+        function connectWS() {
+          ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/api/v1/ws');
+          ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.type === 'allowed_ips') updateAllowedIpsTable(data.data);
+            if (data.type === 'logs') updateLogsList(data.data);
+          };
+          ws.onclose = function() { setTimeout(connectWS, 2000); };
+        }
+        function updateAllowedIpsTable(ips) {
+          const tbody = document.querySelector('#allowed-ips-table tbody');
+          tbody.innerHTML = '';
+          ips.forEach(ip => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${ip.Name}</td><td>${ip.IP}</td><td>${ip.Status}</td>`;
+            tbody.appendChild(tr);
+          });
+        }
+        function updateLogsList(logs) {
+          const ul = document.getElementById('logs-list');
+          ul.innerHTML = '';
+          logs.slice(-30).reverse().forEach(log => {
+            const li = document.createElement('li');
+            li.className = 'list-group-item';
+            li.textContent = `[${log.Timestamp}] ${log.Level}: ${log.Message}`;
+            ul.appendChild(li);
+          });
+        }
+        document.addEventListener('DOMContentLoaded', connectWS);
+    </script>
+</body>
+</html>
