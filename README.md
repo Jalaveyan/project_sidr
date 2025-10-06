@@ -11,7 +11,7 @@
 
 **Quantum VLESS XTLS-Reality VPN** достиг уровня оригинального VLESS с неограниченной пропускной способностью!
 
-<img width="784" height="625" alt="image" src="https://github.com/user-attachments/assets/87cc161e-a73d-4561-956a-0debf5446cc2" />
+<img width="784" height="625" alt="image" src="https://github.com/user-attachments/assets/8592cf81-8000-402f-a02c-48b07c9c2c46" />
 
 
 ### ⚡ Ключевые достижения:
