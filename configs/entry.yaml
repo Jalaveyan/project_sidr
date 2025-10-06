@@ -1,0 +1,63 @@
+# NeuralTunnel Entry Point Configuration
+# VPS #1 - Точка входа для клиентов
+
+server:
+  role: "entry"
+  listen_port: 443
+  listen_address: "0.0.0.0"
+  
+  # Квантовые функции
+  quantum:
+    enabled: true
+    bb84_enabled: true
+    qrng_enabled: true
+    ntru_enabled: true
+    qber_threshold: 0.11
+    key_rotation_interval: 3600  # секунд
+  
+  # AI анализатор
+  ai:
+    enabled: true
+    learning_mode: true
+    decision_threshold: 0.7
+  
+  # CDN маскировка
+  cdn:
+    enabled: true
+    provider: "cloudflare"
+    fake_domain: "cdn.example.com"
+    
+# Цепочка серверов
+chain:
+  next_hop:
+    - address: "VPS2_IP_HERE"  # Замените на IP VPS #2
+      port: 51820
+      role: "exit"
+      protocol: "quantum"
+      
+# Сетевые оптимизации
+network:
+  bbr:
+    enabled: true
+  
+  fail2ban:
+    enabled: true
+    threshold: 5
+    ban_duration: 3600
+    
+  firewall:
+    mode: "whitelist"
+    allowed_ips: []  # Пусто = разрешить всем
+    blocked_ips: []
+
+# Порты
+ports:
+  default:
+    - 443
+    - 8443
+  additional: []
+
+# Логирование
+logging:
+  level: "info"
+  file: "/var/log/neuraltunnel/entry.log"

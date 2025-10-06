@@ -1,0 +1,20 @@
+{
+  "server": "YOUR_ENTRY_VPS_IP",
+  "port": 443,
+  "protocol": "vless",
+  "uuid": "00000000-0000-0000-0000-000000000000",
+  "flow": "xtls-rprx-vision",
+  "reality": {
+    "publicKey": "YOUR_ENTRY_PUBLIC_KEY",
+    "shortId": "YOUR_ENTRY_SHORT_ID",
+    "serverName": "www.microsoft.com"
+  },
+  "quantum": {
+    "enabled": true,
+    "strength": 256
+  },
+  "adaptive": {
+    "enabled": true,
+    "profile": "https"
+  }
+}

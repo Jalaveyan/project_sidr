@@ -1,0 +1,137 @@
+# NeuralTunnel Entry Point - Russia VPS
+# VPS #1 - Точка входа в России (Москва/Ставрополь)
+
+server:
+  role: "russia_entry"
+  listen_port: 443
+  listen_address: "0.0.0.0"
+  server_name: "RU Entry Point"
+  location: "Russia"
+  protocol: "vless"  # VLESS протокол
+  transport: "ws"    # WebSocket transport
+  path: "/neuraltunnel"
+  
+  # Квантовые функции
+  quantum:
+    enabled: true
+    bb84_enabled: true
+    qrng_enabled: true
+    ntru_enabled: true
+    qber_threshold: 0.11
+    key_rotation_interval: 1800  # 30 минут (чаще для РФ)
+  
+  # AI анализатор (критично для РФ)
+  ai:
+    enabled: true
+    learning_mode: true
+    decision_threshold: 0.8  # Выше порог для РФ
+    russia_optimized: true
+  
+  # Маскировка (критично для обхода DPI в РФ)
+  masking:
+    enabled: true
+    primary_method: "cloudflare_cdn"
+    fallback_methods:
+      - "google_https"
+      - "microsoft_azure"
+      - "yandex_cloud"
+    
+  # CDN маскировка
+  cdn:
+    enabled: true
+    provider: "cloudflare"
+    fake_domain: "cdn.cloudflare.net"
+    sni_masking: true
+    
+# Цепочка серверов
+chain:
+  mode: "relay"
+  next_hop:
+    - address: "NETHERLANDS_VPS_IP"  # Замените на IP VPS в Нидерландах
+      port: 443
+      role: "exit"
+      protocol: "vless"
+      transport: "ws"
+      path: "/neuraltunnel-exit"
+      country: "NL"
+      
+# VLESS настройки
+vless:
+  uuid: "auto-generated"  # Генерируется автоматически
+  encryption: "none"      # Шифрование через квантовый слой
+  flow: "xtls-rprx-vision"
+  
+  # TLS настройки
+  tls:
+    enabled: true
+    server_name: "www.microsoft.com"  # SNI маскировка
+    alpn:
+      - "h2"
+      - "http/1.1"
+    fingerprint: "chrome"  # Имитация браузера Chrome
+    
+  # WebSocket настройки
+  websocket:
+    path: "/neuraltunnel"
+    headers:
+      Host: "www.microsoft.com"
+      User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0"
+      
+# Специальные настройки для РФ
+russia:
+  # Обход блокировок
+  bypass:
+    dpi_evasion: true
+    sni_fragmentation: true
+    packet_padding: true
+    timing_obfuscation: true
+    
+  # Белые списки (для маскировки)
+  whitelist_domains:
+    - "google.com"
+    - "cloudflare.com"
+    - "microsoft.com"
+    - "yandex.ru"
+    - "vk.com"
+    
+  # Операторы
+  operators:
+    - name: "Rostelecom"
+      bypass_method: "sni_masking"
+    - name: "MTS"
+      bypass_method: "ip_sidr"
+    - name: "Beeline"
+      bypass_method: "mixed"
+      
+# Сетевые оптимизации
+network:
+  bbr:
+    enabled: true
+  
+  fail2ban:
+    enabled: true
+    threshold: 3  # Строже для РФ
+    ban_duration: 7200
+    
+  firewall:
+    mode: "none"  # Разрешаем всем из РФ
+    
+# Порты (стандартные для обхода)
+ports:
+  default:
+    - 443   # HTTPS
+    - 8443  # Alt HTTPS
+  additional:
+    - 53    # DNS (для обхода)
+    - 80    # HTTP
+
+# Логирование
+logging:
+  level: "debug"  # Подробные логи для РФ
+  file: "/var/log/neuraltunnel/russia_entry.log"
+  
+# Мониторинг
+monitoring:
+  enabled: true
+  report_to_panel: true
+  metrics_interval: 60

@@ -1,0 +1,198 @@
+{
+  "log": {
+    "loglevel": "info",
+    "access": "/tmp/xray-access.log",
+    "error": "/tmp/xray-error.log"
+  },
+  "inbounds": [
+    {
+      "port": 10808,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "userLevel": 0,
+        "allowTransparent": true
+      },
+      "tag": "socks-inbound"
+    },
+    {
+      "port": 10809,
+      "protocol": "http",
+      "settings": {
+        "userLevel": 0,
+        "timeout": 300
+      },
+      "tag": "http-inbound"
+    },
+    {
+      "port": 10810,
+      "protocol": "socks",
+      "settings": {
+        "auth": "noauth",
+        "udp": true,
+        "userLevel": 0,
+        "allowTransparent": true
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      },
+      "tag": "socks-inbound-2"
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "vless",
+      "settings": {
+        "vnext": [
+          {
+            "address": "ENTRY_VPS_IP_HERE",
+            "port": 443,
+            "users": [
+              {
+                "id": "a1b2c3d4-e5f6-1234-5678-9abc-def012345678",
+                "flow": "xtls-rprx-vision",
+                "encryption": "none",
+                "email": "quantum-user"
+              }
+            ]
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "fingerprint": "chrome",
+          "serverName": "www.microsoft.com",
+          "publicKey": "ENTRY_VPS_PUBLIC_KEY_HERE",
+          "shortId": "deadbeef",
+          "spiderX": ""
+        },
+        "sockopt": {
+          "tcpFastOpen": true,
+          "tcpNoDelay": true,
+          "tcpKeepAliveIdle": 30
+        }
+      },
+      "mux": {
+        "enabled": true,
+        "concurrency": 8
+      },
+      "tag": "quantum-outbound"
+    },
+    {
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIP"
+      },
+      "tag": "direct-outbound"
+    },
+    {
+      "protocol": "dns",
+      "settings": {
+        "address": "8.8.8.8",
+        "port": 53,
+        "network": "tcp"
+      },
+      "tag": "dns-outbound"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "inboundTag": [
+          "socks-inbound",
+          "http-inbound",
+          "socks-inbound-2"
+        ],
+        "outboundTag": "quantum-outbound"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:ru",
+          "domain:yandex.ru",
+          "domain:mail.ru",
+          "domain:vk.com",
+          "domain:gosuslugi.ru",
+          "domain:sberbank.ru"
+        ],
+        "outboundTag": "direct-outbound"
+      },
+      {
+        "type": "field",
+        "network": "udp",
+        "port": 53,
+        "outboundTag": "dns-outbound"
+      },
+      {
+        "type": "field",
+        "domain": [
+          "geosite:category-ads-all",
+          "geosite:malware"
+        ],
+        "outboundTag": "blocked"
+      }
+    ]
+  },
+  "dns": {
+    "servers": [
+      "8.8.8.8",
+      "1.1.1.1",
+      "https+local://8.8.8.8/dns-query",
+      {
+        "address": "223.5.5.5",
+        "port": 53,
+        "domains": [
+          "geosite:ru"
+        ]
+      }
+    ]
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserUplink": true,
+        "statsUserDownlink": true,
+        "bufferSize": 4
+      }
+    }
+  },
+  "stats": {},
+  "quantum": {
+    "enabled": true,
+    "client": true,
+    "keyExchange": {
+      "method": "bb84",
+      "strength": 256,
+      "timeout": 30
+    },
+    "postQuantum": {
+      "algorithm": "ntru",
+      "params": "EES743EP1",
+      "hybrid_mode": true
+    },
+    "adaptiveMasking": {
+      "enabled": true,
+      "profile": "https",
+      "strategies": [
+        "timing_jitter",
+        "size_morphing"
+      ],
+      "aggressiveness": 0.5
+    },
+    "monitoring": {
+      "enabled": true,
+      "log_quantum_events": true,
+      "show_qber": true
+    }
+  }
+}

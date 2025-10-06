@@ -1,0 +1,159 @@
+{
+  "log": {
+    "loglevel": "info",
+    "access": "/var/log/quantum-vpn/access.log",
+    "error": "/var/log/quantum-vpn/error.log"
+  },
+  "inbounds": [
+    {
+      "port": 443,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "GENERATE_CLIENT_UUID_HERE",
+            "flow": "xtls-rprx-vision",
+            "email": "quantum-user"
+          }
+        ],
+        "decryption": "none",
+        "fallbacks": [
+          {
+            "dest": "8001",
+            "xver": 1
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "reality",
+        "realitySettings": {
+          "show": false,
+          "dest": "www.microsoft.com:443",
+          "xver": 0,
+          "serverNames": [
+            "www.microsoft.com",
+            "www.windows.com",
+            "update.microsoft.com"
+          ],
+          "privateKey": "GENERATE_PRIVATE_KEY_HERE",
+          "shortIds": [
+            "GENERATE_SHORT_ID_HERE"
+          ]
+        },
+        "sockopt": {
+          "mark": 255,
+          "tcpFastOpen": true,
+          "tcpNoDelay": true,
+          "tcpKeepAliveIdle": 30
+        }
+      },
+      "tag": "in-vless",
+      "quantum": {
+        "enabled": true,
+        "bb84": {
+          "strength": 256,
+          "qber_threshold": 0.11
+        },
+        "ntru": {
+          "enabled": true,
+          "params": "EES743EP1"
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {
+        "domainStrategy": "UseIP"
+      },
+      "tag": "direct"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "domain": [
+          "geosite:ru",
+          "domain:yandex.ru",
+          "domain:mail.ru",
+          "domain:vk.com",
+          "domain:gosuslugi.ru"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ip": [
+          "geoip:ru"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "network": "tcp,udp",
+        "outboundTag": "direct"
+      }
+    ]
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "handshake": 4,
+        "connIdle": 300,
+        "uplinkOnly": 2,
+        "downlinkOnly": 5,
+        "bufferSize": 4,
+        "statsUserUplink": true,
+        "statsUserDownlink": true
+      }
+    }
+  },
+  "stats": {},
+  "adaptiveMasking": {
+    "enabled": true,
+    "profile": "https",
+    "strategies": [
+      "timing_jitter",
+      "size_morphing",
+      "flow_mimicry"
+    ],
+    "aggressiveness": 0.7,
+    "ipSidr": {
+      "enabled": true,
+      "whitelist": "/etc/quantum-vpn/russian_ips.txt",
+      "autoUpdate": true,
+      "updateInterval": 21600
+    }
+  },
+  "monitoring": {
+    "enabled": true,
+    "port": 9090,
+    "metricsPath": "/metrics",
+    "quantumMetrics": true,
+    "networkMetrics": true,
+    "securityMetrics": true
+  },
+  "performance": {
+    "high_performance_mode": true,
+    "skip_qber_check": true,
+    "cache_quantum_keys": true,
+    "enable_parallel_processing": true,
+    "enable_zero_copy": true,
+    "max_packet_size": 65536,
+    "packet_pool_size": 5000,
+    "crypto_cache_size": 5000,
+    "session_cache_timeout": 300,
+    "disable_quantum_by_default": false,
+    "disable_adaptive_masking_by_default": false,
+    "minimal_packet_processing": true,
+    "aggressive_optimizations": true,
+    "turbo_mode": true,
+    "unlimited_bandwidth": true,
+    "disable_all_safety_checks": false,
+    "maximize_throughput": true
+  }
+}

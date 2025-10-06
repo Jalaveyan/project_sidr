@@ -1,0 +1,180 @@
+# Build artifacts
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.so
+*.so.*
+*.a
+*.lib
+*.dll
+*.exe
+*.out
+
+# Logs
+*.log
+logs/
+var/log/
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Development files
+debug/
+release/
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.tmp_proj
+*.vspscc
+*.vssscc
+.builds
+
+# Test files
+tests/
+test_*
+*_test.*
+*_test.cpp
+*_test.h
+test_results/
+
+# Demo files
+demo/
+example/
+examples/
+sample/
+samples/
+
+# Documentation drafts
+*.draft
+draft_*
+DRAFT_*
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Configuration backups
+config.bak
+*.old
+*.orig
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage reports
+coverage/
+*.gcno
+*.gcda
+*.gcov
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary folders
+tmp/
+temp/
+
+# Secrets (keep these out of version control)
+secrets/
+*.key
+*.pem
+private/
+keys/
+
+# Production runtime
+runtime/
+data/
+cache/
+
+# Monitoring data
+monitoring/db/
+monitoring/reports/
+
+# Only keep source and production configs
+# Keep: configs/*.json configs/*.yaml
+# Ignore everything else in configs except specified patterns
+configs/*
+!configs/*.json
+!configs/*.yaml
+!configs/services/
+
+# Keep only essential documentation
+# Keep: README.md, USER_GUIDE.md, etc.
+# Ignore development docs
+docs/*
+!docs/README.md
+
+# Keep only production scripts
+# Keep: deploy.sh, start.sh, production_start.sh
+# Ignore development scripts
+scripts/*
+!scripts/production_*.sh
+!scripts/deploy.sh
+!scripts/start.sh
+
+# Ignore old Windows files
+windows/
+mingw*/
+
+# Ignore old revolutionary demo files
+revolutionary*
+
+# Ignore final summary and features docs (keep only essential)
+FINAL_SUMMARY.md
+QUANTUM_FEATURES.md
+NEURALTUNNEL_EXPLAINED.md
+README_FINAL.md
+REAL_VPN_SETUP.md
+IP_SIDR_EXPLAINED.md
+INSTRUCTION.md
+VLESS_PROTOCOL.md
+VPS_DEPLOYMENT.md
+RUSSIA_NETHERLANDS_CHAIN.md

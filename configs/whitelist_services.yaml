@@ -1,0 +1,21 @@
+# Whitelist services (allowed/expected to work)
+# RU
+- yandex.ru
+- vk.com
+- mail.ru
+- ok.ru
+- rambler.ru
+- sber.ru
+- wildberries.ru
+- ozon.ru
+# Abroad
+- google.com
+- youtube.com
+- cloudflare.com
+- wikipedia.org
+- github.com
+- twitter.com
+# IPs/subnets examples
+- 77.88.8.8
+- 94.100.180.200
+- 8.8.8.8

@@ -1,0 +1,104 @@
+# NeuralTunnel Server Configuration
+
+server:
+  # Основные настройки
+  listen_port: 8443
+  listen_address: "0.0.0.0"
+  
+  # Квантовые функции
+  quantum:
+    enabled: true
+    masking_service: "cloudflare"  # cloudflare, google, microsoft, auto
+    entropy_level: "high"          # low, medium, high
+  
+  # AI анализатор
+  ai:
+    enabled: true
+    learning_mode: true
+    decision_threshold: 0.7
+  
+  # CDN маскировка
+  cdn:
+    enabled: true
+    provider: "cloudflare"
+    fake_domain: "cdn.example.com"
+    
+# Сетевые оптимизации
+network:
+  bbr:
+    enabled: true
+  
+  fail2ban:
+    enabled: true
+    threshold: 5
+    ban_duration: 3600  # секунд
+    
+  firewall:
+    mode: "whitelist"   # whitelist, blacklist, none
+    allowed_ips: []
+    blocked_ips: []
+
+# Порты
+ports:
+  default:
+    - 443
+    - 8443
+    - 4433
+    - 9443
+  additional: []
+
+# Цепочки VPS (для dual-VPS setup)
+chains:
+  - id: "relay-1"
+    name: "CloudFlare Relay"
+    nodes:
+      - type: "cdn"
+        address: "yourdomain.com"
+        port: 443
+        country: "US"
+      - type: "vps"
+        address: "relay.vps.ip"
+        port: 8443
+        country: "NL"
+        
+# Подписки
+subscriptions:
+  basic:
+    max_nodes: 3
+    max_bandwidth: 100  # Mbps
+    features: ["basic_encryption", "standard_routing"]
+    
+  premium:
+    max_nodes: 10
+    max_bandwidth: 1000  # Mbps
+    features: ["quantum_encryption", "ai_routing", "cdn_masking"]
+    
+  enterprise:
+    max_nodes: -1  # unlimited
+    max_bandwidth: -1  # unlimited
+    features: ["all"]
+
+# Логирование
+logging:
+  level: "info"  # debug, info, warn, error
+  file: "/var/log/neuraltunnel/server.log"
+  max_size: 100  # MB
+  max_backups: 10
+  
+# Реальное сканирование
+probing:
+  enabled: true
+  interval: 900  # секунд (15 минут)
+  targets:
+    - "configs/services/whitelist_sni.txt"
+    - "configs/services/blacklist_sni.txt"
+    - "configs/services/ip_ranges.txt"
+  
+# Веб-панель
+web_panel:
+  enabled: true
+  port: 8080
+  auth:
+    enabled: false  # включить для production
+    username: "admin"
+    password: "changeme"

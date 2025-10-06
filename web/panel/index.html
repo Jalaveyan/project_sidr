@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>NeuralTunnel: Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #0f1116; color: #e5e7eb; }
+        .wrap { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+        .nav { display: flex; gap: 8px; margin-bottom: 16px; }
+        .nav button { background:#1f2937; color:#e5e7eb; border:1px solid #374151; padding:8px 12px; border-radius:6px; cursor:pointer; }
+        .nav button.active { background:#2563eb; border-color:#2563eb; }
+        .card { background:#111827; border:1px solid #374151; border-radius:8px; padding:16px; margin-bottom:16px; }
+        .row { display:flex; gap:16px; flex-wrap:wrap; }
+        .col { flex:1 1 300px; }
+        input, select, textarea { background:#0b1220; color:#e5e7eb; border:1px solid #374151; border-radius:6px; padding:8px; }
+        label { display:block; margin:6px 0 4px; color:#9ca3af; }
+        table { width:100%; border-collapse:collapse; }
+        th, td { border-bottom:1px solid #374151; padding:6px 8px; text-align:left; }
+        .hint { color:#9ca3af; font-size:12px; }
+        .ok { color:#22c55e; }
+        .bad { color:#ef4444; }
+        .hidden { display:none; }
+        .badge { display:inline-block; font-size:11px; padding:2px 6px; border-radius:10px; margin-left:6px; }
+        .badge-mobile { background:#0b3b17; color:#22c55e; border:1px solid #14532d; }
+        .badge-wireline { background:#132b47; color:#60a5fa; border:1px solid #1e3a8a; }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="nav">
+        <button id="tabChains" class="active" onclick="showTab('chains')">VPS/CDN Chains</button>
+        <button onclick="showTab('stats')">Аналитика</button>
+        <button onclick="showTab('control')">Управление</button>
+        <button onclick="showTab('logs')">Логи</button>
+        <button onclick="showTab('regions')">Региональный сканер</button>
+        <button onclick="showTab('map')">Карта</button>
+        <button onclick="showTab('keys')">Ключи</button>
+    </div>
+
+    <div id="tabViewChains">
+        <div class="card">
+            <div class="row">
+                <div class="col">
+                    <label>Фильтр по подписке</label>
+                    <select id="filterSub" onchange="renderChains()">
+                        <option value="all">Все</option>
+                        <option value="basic">Basic</option>
+                        <option value="premium">Premium</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>Название цепочки</label>
+                    <input id="chainName" placeholder="Название цепочки" />
+                </div>
+                <div class="col">
+                    <label>Подписка</label>
+                    <select id="chainSub"><option value="basic">Basic</option><option value="premium">Premium</option></select>
+                </div>
+                <div class="col" style="align-self:flex-end">
+                    <button onclick="addChain()">Добавить цепочку</button>
+                    <button onclick="exportChains()">Экспорт</button>
+                    <input type="file" id="importFile" style="display:none" onchange="importChains(event)" />
+                    <button onclick="document.getElementById('importFile').click()">Импорт</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h4>Визуализация маршрута</h4>
+            <div id="routeVisual" style="padding:20px; text-align:center; font-size:16px;"></div>
+            <div id="routeDetails" style="padding:10px; font-size:13px; color:#666;"></div>
+        </div>
+        <div class="card"><ul id="chainList" style="list-style:none; padding:0; margin:0;"></ul></div>
+    </div>
+
+    <div id="tabViewStats" class="hidden">
+        <div class="card">
+            <h3>Аналитика/Статистика</h3>
+            <div class="row">
+                <div class="col">
+                    <div>Обработано пакетов: <b id="sProcessed">-</b></div>
+                    <div>Замаскировано пакетов: <b id="sMasked">-</b></div>
+                    <div>Активных соединений: <b id="sActive">-</b></div>
+                    <div>Сигнатур: <b id="sSig">-</b></div>
+                </div>
+                <div class="col">
+                    <div>VLESS: <b id="sVless">-</b></div>
+                    <div>REALITY: <b id="sReality">-</b></div>
+                    <div>RU-трафик: <b id="sRU">-</b></div>
+                    <div>Трафик всего: <b id="sTraffic">-</b></div>
+                </div>
+                <div class="col">
+                    <div>Разрешённых IP: <b id="sAllowedIPs">-</b></div>
+                    <div>Обновлено: <span id="sUpdated" class="hint">-</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tabViewControl" class="hidden">
+        <div class="card">
+            <h3>Порты</h3>
+            <div class="row">
+                <div class="col">
+                    <label>Список портов (через запятую)</label>
+                    <input id="portsInput" placeholder="443,9443" />
+                </div>
+                <div class="col" style="align-self:flex-end"><button onclick="savePorts()">Сохранить порты</button></div>
+            </div>
+            <div class="hint">Текущие порты: <span id="portsCurrent">-</span></div>
+        </div>
+        <div class="card">
+            <h3>Firewall</h3>
+            <div class="row">
+                <div class="col">
+                    <label>Allow IP (через запятую)</label>
+                    <input id="fwAllow" placeholder="1.2.3.4,5.6.7.8" />
+                </div>
+                <div class="col">
+                    <label>Block IP (через запятую)</label>
+                    <input id="fwBlock" placeholder="9.9.9.9" />
+                </div>
+                <div class="col" style="align-self:flex-end"><button onclick="saveFirewall()">Применить Firewall</button></div>
+            </div>
+            <div class="hint">Текущие списки будут загружены ниже автоматически.</div>
+            <div id="fwState" class="hint"></div>
+        </div>
+        <div class="card">
+            <h3>BBR / Fail2Ban</h3>
+            <div class="row">
+                <div class="col">
+                    <label>BBR</label>
+                    <select id="bbrSelect"><option value="true">Включить</option><option value="false">Выключить</option></select>
+                </div>
+                <div class="col">
+                    <label>Fail2Ban threshold</label>
+                    <input id="f2bInput" type="number" min="1" value="3" />
+                </div>
+                <div class="col" style="align-self:flex-end"><button onclick="applyBBR()">Применить</button> <button onclick="applyF2B()">Сохранить Fail2Ban</button></div>
+            </div>
+            <div class="hint">Текущие значения: BBR=<span id="bbrState">-</span>, Threshold=<span id="f2bState">-</span></div>
+        </div>
+    </div>
+
+    <div id="tabViewLogs" class="hidden">
+        <div class="card">
+            <h3>Логи</h3>
+            <button onclick="clearLogs()">Очистить</button>
+            <div class="hint">Автообновление раз в 2 сек.</div>
+            <table id="logsTable"><thead><tr><th>Время</th><th>Уровень</th><th>Источник</th><th>Сообщение</th></tr></thead><tbody></tbody></table>
+        </div>
+    </div>
+
+    <div id="tabViewRegions" class="hidden">
+        <div class="card">
+            <h3>Сканер по регионам РФ (SNI vs IP SIDR)</h3>
+            <div class="row">
+                <div class="col">
+                    <label>Фильтр по типу оператора</label>
+                    <select id="opTypeFilter" onchange="refreshRegions()">
+                        <option value="all">Все</option>
+                        <option value="mobile">Мобильный</option>
+                        <option value="wireline">Проводной</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label>Фильтр по политике</label>
+                    <select id="policyFilter" onchange="refreshRegions()">
+                        <option value="all">Любая</option>
+                        <option value="whitelist">Белые списки</option>
+                        <option value="blacklist">Черные списки</option>
+                        <option value="none">Нет списков</option>
+                    </select>
+                </div>
+            </div>
+            <div class="hint">Данные обновляются каждые 5 секунд. Рекомендации формируются по соотношению SNI/IP.</div>
+            <table id="regionsTable"><thead><tr><th>Город</th><th>Округ</th><th>Политика</th><th>SNI</th><th>IP SIDR</th><th>Всего</th><th>Рекомендация</th><th>Сервисы</th><th>Действия</th></tr></thead><tbody></tbody></table>
+        </div>
+    </div>
+
+    <div id="tabViewMap" class="hidden">
+        <div class="card">
+            <h3>Карта глушений/обхода</h3>
+            <div id="map" style="height:520px; border-radius:8px; overflow:hidden"></div>
+            <div class="hint">Источник: /api/v1/region/map (GeoJSON). Цвет: зелёный=OK, оранжевый=Degraded, красный=Jammed.</div>
+        </div>
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+        <script>
+        let mapInstance=null, geoLayer=null;
+        function initMap(){
+          if(mapInstance) return;
+          mapInstance = L.map('map').setView([55.75,37.61], 4);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18, attribution: '© OpenStreetMap' }).addTo(mapInstance);
+          loadGeo();
+        }
+        function styleByStatus(status){
+          if(status==='Jammed') return { color:'#ef4444' };
+          if(status==='Degraded') return { color:'#f59e0b' };
+          return { color:'#22c55e' };
+        }
+        function loadGeo(){
+          fetch('/api/v1/region/map').then(r=>r.json()).then(geo=>{
+            if(geoLayer){ mapInstance.removeLayer(geoLayer); }
+            geoLayer = L.geoJSON(geo, {
+              pointToLayer: function (feature, latlng) {
+                const st = (feature.properties&&feature.properties.status)||'OK';
+                const m = L.circleMarker(latlng, { radius: 7, weight: 2, fillOpacity: 0.7, ...styleByStatus(st) });
+                const p = feature.properties||{};
+                m.bindPopup(`<b>${p.city||''}</b><br/>Статус: ${st}<br/>Оператор: ${p.operator||''} (${p.type||''})<br/>Политика: ${p.policy||''}<br/>Рекомендация: ${p.recommendation||''}`);
+                return m;
+              }
+            }).addTo(mapInstance);
+            if(geo.features&&geo.features.length){
+              const b = geoLayer.getBounds(); if(b.isValid()) mapInstance.fitBounds(b.pad(0.2));
+            }
+          }).catch(()=>{});
+        }
+        </script>
+    </div>
+    
+    <div id="tabViewKeys" class="hidden">
+        <div class="card">
+            <h3>Управление ключами</h3>
+            <div class="row">
+                <div class="col">
+                    <button onclick="generateKey()">Сгенерировать новый ключ</button>
+                    <button onclick="exportKeys()">Экспорт ключей</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <table id="keysTable">
+                <thead>
+                    <tr>
+                        <th>Ключ</th>
+                        <th>Тип подписки</th>
+                        <th>Статус</th>
+                        <th>Создан</th>
+                        <th>Использований</th>
+                        <th>Комментарий</th>
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody id="keysList">
+                    <!-- Ключи загружаются динамически -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Модальное окно для генерации ключа -->
+        <div id="keyModal" class="modal hidden">
+            <div class="modal-content">
+                <h4>Новый ключ доступа</h4>
+                <div class="row">
+                    <div class="col">
+                        <label>Тип подписки</label>
+                        <select id="keySubscription">
+                            <option value="basic">Basic (3 узла)</option>
+                            <option value="premium">Premium (10 узлов)</option>
+                            <option value="enterprise">Enterprise (без ограничений)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Ограничение использований (0 = без ограничений)</label>
+                        <input type="number" id="keyUsageLimit" value="0" min="0">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <label>Комментарий</label>
+                        <input type="text" id="keyComment" placeholder="Например: Для Ивана">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">
+                        <button onclick="createKey()">Создать</button>
+                        <button onclick="closeKeyModal()">Отмена</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let chains = [];
+let dragNode = null, dragChain = null, dragIndex = null;
+let activeChainId = null;
+
+function showTab(name){
+  document.getElementById('tabViewChains').classList.toggle('hidden', name!=='chains');
+  document.getElementById('tabViewStats').classList.toggle('hidden', name!=='stats');
+  document.getElementById('tabViewControl').classList.toggle('hidden', name!=='control');
+  document.getElementById('tabViewLogs').classList.toggle('hidden', name!=='logs');
+  document.getElementById('tabViewRegions').classList.toggle('hidden', name!=='regions');
+  document.getElementById('tabViewMap').classList.toggle('hidden', name!=='map');
+  document.getElementById('tabViewKeys').classList.toggle('hidden', name!=='keys');
+  document.getElementById('tabChains').classList.toggle('active', name==='chains');
+  if(name==='map'){ initMap(); }
+}
+
+function fetchChains(){
+  fetch('/api/v1/chains').then(r=>r.json()).then(data=>{ chains=data.chains||[]; renderChains(); });
+}
+function renderChains(){
+  const filter=document.getElementById('filterSub').value||'all';
+  const list=document.getElementById('chainList'); list.innerHTML='';
+  let filtered=chains; if(filter!=='all') filtered=chains.filter(c=>(c.subscription||'basic')===filter);
+  for(const chain of filtered){
+    const li=document.createElement('li'); li.style.padding='8px 0';
+    li.innerHTML=`<b>${chain.name}</b> <span class="hint">[${chain.subscription||'basic'}]</span>
+      <div id="nodes-${chain.id}" style="margin:6px 0"></div>
+      <button onclick="applyChain('${chain.id}')">Применить</button>
+      <button onclick="editChain('${chain.id}')">✏️</button>
+      <button onclick="deleteChain('${chain.id}')">🗑️</button>
+      <button onclick="addNode('${chain.id}')">+ VPS/CDN</button>`;
+    list.appendChild(li); renderNodes(chain);
+  }
+  renderRoute();
+}
+function renderNodes(chain){
+  const nodesDiv=document.getElementById('nodes-'+chain.id); nodesDiv.innerHTML='';
+  chain.nodes.forEach((node,idx)=>{
+    const n=document.createElement('div'); n.style.margin='2px 0';
+    n.draggable=true; n.innerText=`${node.type}: ${node.address} (${node.country})`;
+    n.ondragstart=()=>{dragNode=node;dragChain=chain;dragIndex=idx;};
+    n.ondragend=()=>{dragNode=null;dragChain=null;dragIndex=null;};
+    n.ondragover=e=>e.preventDefault();
+    n.ondrop=()=>{ if(dragNode&&dragChain&&dragChain.id===chain.id&&dragIndex!==idx){ chain.nodes.splice(dragIndex,1); chain.nodes.splice(idx,0,dragNode); updateChain(chain);} };
+    nodesDiv.appendChild(n);
+  });
+}
+function renderRoute(){
+  const visual=document.getElementById('routeVisual');
+  const details=document.getElementById('routeDetails');
+  visual.innerHTML='';
+  details.innerHTML='';
+  
+  const chain=chains.find(c=>c.id===activeChainId);
+  if(!chain || !chain.nodes || chain.nodes.length===0) {
+    visual.innerHTML='<span style="color:#999">Цепочка не выбрана</span>';
+    return;
+  }
+  
+  // Визуальный маршрут с флагами
+  let html='<div style="display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;">';
+  html+='<div style="padding:10px;background:#e0e7ff;border-radius:8px;font-weight:bold;">👤 Клиент (РФ)</div>';
+  html+='<span style="font-size:24px;">→</span>';
+  
+  chain.nodes.forEach((node,idx)=>{
+    const flag=node.country==='RU'?'🇷🇺':node.country==='NL'?'🇳🇱':node.country==='DE'?'🇩🇪':node.country==='FI'?'🇫🇮':'🌐';
+    const bg=node.country==='RU'?'#fecaca':'#bbf7d0';
+    html+=`<div style="padding:10px;background:${bg};border-radius:8px;border:2px solid #4ade80;">${flag} <b>${node.type}</b><br><small>${node.address}</small></div>`;
+    if(idx<chain.nodes.length-1) html+='<span style="font-size:24px;">→</span>';
+  });
+  
+  html+='<span style="font-size:24px;">→</span>';
+  html+='<div style="padding:10px;background:#d1fae5;border-radius:8px;font-weight:bold;">🌐 Интернет</div>';
+  html+='</div>';
+  visual.innerHTML=html;
+  
+  // Детали
+  const route=chain.nodes.map(n=>{
+    const c=n.country==='RU'?'Россия':n.country==='NL'?'Нидерланды':n.country==='DE'?'Германия':n.country;
+    return `${c} (${n.address})`;
+  }).join(' → ');
+  details.innerHTML=`<b>Цепочка:</b> ${chain.name} [${chain.subscription||'basic'}]<br><b>Маршрут:</b> ${route} → Интернет`;
+}
+function addChain(){
+  const name=document.getElementById('chainName').value.trim();
+  const subscription=document.getElementById('chainSub').value;
+  if(!name) return alert('Введите название цепочки!');
+  fetch('/api/v1/chains',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name, nodes:[], subscription})}).then(fetchChains);
+  document.getElementById('chainName').value='';
+}
+function deleteChain(id){ fetch('/api/v1/chains/'+id,{method:'DELETE'}).then(fetchChains); }
+function editChain(id){ const c=chains.find(x=>x.id===id); const nn=prompt('Новое название:',c.name); const ns=prompt('Подписка (basic/premium):',c.subscription||'basic'); if(nn||ns){ c.name=nn||c.name; c.subscription=ns||c.subscription; updateChain(c);} }
+function addNode(id){ const c=chains.find(x=>x.id===id); const t=prompt('Тип (VPS/CDN):','VPS'); const a=prompt('Адрес:','1.2.3.4'); const k=prompt('Страна:','RU'); if(!t||!a)return; c.nodes.push({id:Date.now().toString(),type:t,address:a,country:k,status:'active'}); updateChain(c); }
+function updateChain(c){ fetch('/api/v1/chains/'+c.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(c)}).then(fetchChains); }
+function applyChain(id){ activeChainId=id; fetch('/api/v1/chains/'+id+'/apply',{method:'POST'}).then(r=>r.json()).then(()=>{ renderRoute(); }); }
+function exportChains(){ window.open('/api/v1/chains/export','_blank'); }
+function importChains(e){ const f=e.target.files[0]; if(!f)return; const r=new FileReader(); r.onload=ev=>{ fetch('/api/v1/chains/import',{method:'POST',headers:{'Content-Type':'application/json'},body:ev.target.result}).then(fetchChains); }; r.readAsText(f); }
+
+// Stats
+function refreshStats(){ fetch('/api/v1/stats').then(r=>r.json()).then(s=>{ document.getElementById('sProcessed').innerText=s.processed_packets; document.getElementById('sMasked').innerText=s.masked_packets; document.getElementById('sActive').innerText=s.active_connections; document.getElementById('sSig').innerText=s.signature_count; document.getElementById('sVless').innerText=s.vless_packets; document.getElementById('sReality').innerText=s.reality_packets; document.getElementById('sRU').innerText=s.russia_packets; document.getElementById('sTraffic').innerText=s.total_traffic; document.getElementById('sAllowedIPs').innerText=s.allowed_ips; document.getElementById('sUpdated').innerText=s.last_update; }); }
+setInterval(refreshStats, 2000);
+
+// Control: ports
+function loadPorts(){ fetch('/api/v1/neural/ports').then(r=>r.json()).then(d=>{ document.getElementById('portsCurrent').innerText=(d.ports||[]).join(', '); }); }
+function savePorts(){ const raw=document.getElementById('portsInput').value.trim(); const ports=raw?raw.split(',').map(x=>parseInt(x.trim())).filter(Boolean):[]; fetch('/api/v1/neural/ports',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ports})}).then(loadPorts); }
+
+// Firewall
+function loadFirewall(){ fetch('/api/v1/neural/firewall').then(r=>r.json()).then(fw=>{ document.getElementById('fwState').innerText='Allow: '+(fw.Allowed||[]).join(', ')+' | Block: '+(fw.Blocked||[]).join(', '); }); }
+function saveFirewall(){ const allow=(document.getElementById('fwAllow').value.trim()||'').split(',').map(s=>s.trim()).filter(Boolean); const block=(document.getElementById('fwBlock').value.trim()||'').split(',').map(s=>s.trim()).filter(Boolean); fetch('/api/v1/neural/firewall',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({Allowed:allow,Blocked:block})}).then(loadFirewall); }
+
+// BBR / Fail2Ban
+function loadBBR(){ fetch('/api/v1/neural/bbr').then(r=>r.json()).then(x=>{ document.getElementById('bbrState').innerText=x.bbr; document.getElementById('bbrSelect').value=String(!!x.bbr); }); }
+function applyBBR(){ const bbr=document.getElementById('bbrSelect').value==='true'; fetch('/api/v1/neural/bbr',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({bbr})}).then(loadBBR); }
+function loadF2B(){ fetch('/api/v1/neural/fail2ban').then(r=>r.json()).then(x=>{ document.getElementById('f2bState').innerText=x.threshold; document.getElementById('f2bInput').value=x.threshold; }); }
+function applyF2B(){ const threshold=parseInt(document.getElementById('f2bInput').value||'3'); fetch('/api/v1/neural/fail2ban',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({threshold})}).then(loadF2B); }
+
+// Logs
+function refreshLogs(){ fetch('/api/v1/logs').then(r=>r.json()).then(x=>{ const tb=document.querySelector('#logsTable tbody'); tb.innerHTML=''; (x.logs||[]).slice(-200).reverse().forEach(l=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${l.timestamp||''}</td><td>${l.level||''}</td><td>${l.source||''}</td><td>${l.message||''}</td>`; tb.appendChild(tr); }); }); }
+function clearLogs(){ fetch('/api/v1/logs',{method:'DELETE'}).then(refreshLogs); }
+setInterval(refreshLogs, 2000);
+
+function refreshRegions(){
+  const typeFilter = document.getElementById('opTypeFilter') ? document.getElementById('opTypeFilter').value : 'all';
+  const policyFilter = document.getElementById('policyFilter') ? document.getElementById('policyFilter').value : 'all';
+  fetch('/api/v1/region/scan').then(r=>r.json()).then(data=>{
+    const tb=document.querySelector('#regionsTable tbody'); tb.innerHTML='';
+    (data.items||[]).filter(it=> policyFilter==='all' || it.policy_mode===policyFilter).forEach(item=>{
+      let servicesHtml = '';
+      if(item.services && item.services.length){
+        const russianServices = item.services.filter(s => s.category === 'russian');
+        const foreignServices = item.services.filter(s => s.category === 'foreign' || !s.category);
+
+        let russianHtml = '';
+        if (russianServices.length > 0) {
+            russianHtml = '<strong>РФ:</strong> ' + russianServices.map(s => `<span class="badge ${s.status==='up'?'badge-success':'badge-danger'}">${s.name}</span>`).join(' ');
+        }
+
+        let foreignHtml = '';
+        if (foreignServices.length > 0) {
+            foreignHtml = '<strong>Глобальные:</strong> ' + foreignServices.map(s => `<span class="badge ${s.status==='up'?'badge-success':'badge-danger'}">${s.name}</span>`).join(' ');
+        }
+        
+        servicesHtml = russianHtml + (russianHtml && foreignHtml ? '<br>' : '') + foreignHtml;
+      }
+
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${item.city}</td><td>${item.region}</td><td>${item.policy_mode}</td><td>${item.sni}</td><td>${item.ip_sidr}</td><td>${item.total}</td><td>${item.recommendation}</td><td>${servicesHtml}</td><td><button onclick=\"applyRegion('${item.recommendation}')\">Применить</button></td>`;
+      tb.appendChild(tr);
+      const trOps=document.createElement('tr');
+      const td=document.createElement('td'); td.colSpan=9;
+      const inner = document.createElement('div'); inner.style.margin='8px 0 16px 0';
+      let html = '<table style="width:100%"><thead><tr><th>Оператор</th><th>Тип</th><th>SNI</th><th>IP SIDR</th><th>Всего</th><th>Рекомендация</th><th>Действия</th></tr></thead><tbody>';
+      (item.operators||[]).filter(op=> typeFilter==='all' || op.type===typeFilter).forEach(op=>{
+        const badge = op.type==='mobile' ? '<span class="badge badge-mobile">мобильный</span>' : '<span class="badge badge-wireline">проводной</span>';
+        html += `<tr><td>${op.name} ${badge}</td><td>${op.type}</td><td>${op.sni}</td><td>${op.ip_sidr}</td><td>${op.total}</td><td>${op.recommendation}</td><td><button onclick=\"applyRegion('${op.recommendation}')\">Применить</button></td></tr>`;
+      });
+      html += '</tbody></table>';
+      inner.innerHTML = html; td.appendChild(inner); trOps.appendChild(td); tb.appendChild(trOps);
+    });
+  });
+}
+function applyRegion(rec){
+  // 1) загрузим текущие цепочки
+  fetch('/api/v1/chains').then(r=>r.json()).then(data=>{
+    chains = data.chains||[];
+    // 2) найдём/создадим служебную цепочку
+    let chain = chains.find(c=>c.name==='Region Auto');
+    if(!chain){ chain = { id:null, name:'Region Auto', subscription:'basic', nodes:[] }; }
+    // 3) наполняем узлами по рекомендации
+    if(rec==='SNI'){
+      chain.nodes = [
+        {id:Date.now().toString()+'a', type:'CDN', address:'cdn-ru-1.example.com', country:'RU', status:'active'},
+        {id:Date.now().toString()+'b', type:'CDN', address:'cdn-ru-2.example.com', country:'RU', status:'active'}
+      ];
+    } else if(rec==='IP_SIDR'){
+      chain.nodes = [
+        {id:Date.now().toString()+'c', type:'VPS', address:'77.88.8.8', country:'RU', status:'active'},
+        {id:Date.now().toString()+'d', type:'VPS', address:'94.100.180.200', country:'RU', status:'active'}
+      ];
+    } else { // MIXED
+      chain.nodes = [
+        {id:Date.now().toString()+'e', type:'CDN', address:'cdn-ru-1.example.com', country:'RU', status:'active'},
+        {id:Date.now().toString()+'f', type:'VPS', address:'77.88.8.8', country:'RU', status:'active'}
+      ];
+    }
+    // 4) сохранить цепочку (POST если новая, иначе PUT)
+    const save = chain.id ?
+      fetch('/api/v1/chains/'+chain.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(chain)}) :
+      fetch('/api/v1/chains',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(chain)});
+    save.then(r=>r.json()).then(res=>{
+      const id = chain.id || (res.chain && res.chain.ID) || (res.chain && res.chain.id) || res.id || '1';
+      activeChainId = id;
+      // 5) применить
+      fetch('/api/v1/chains/'+id+'/apply',{method:'POST'}).then(()=>{ fetchChains(); renderRoute(); alert('Рекомендация '+rec+' применена через цепочку "Region Auto"'); });
+    });
+  });
+}
+setInterval(refreshRegions, 5000);
+
+// Функции для управления ключами
+let keys = [];
+
+function generateKey() {
+    document.getElementById('keyModal').classList.remove('hidden');
+}
+
+function closeKeyModal() {
+    document.getElementById('keyModal').classList.add('hidden');
+}
+
+function createKey() {
+    const subscription = document.getElementById('keySubscription').value;
+    const usageLimit = parseInt(document.getElementById('keyUsageLimit').value) || 0;
+    const comment = document.getElementById('keyComment').value;
+    
+    fetch('/api/v1/keys', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            subscription: subscription,
+            usage_limit: usageLimit,
+            comment: comment
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.key) {
+            alert('Ключ создан: ' + data.key);
+            closeKeyModal();
+            loadKeys();
+        }
+    })
+    .catch(err => console.error('Ошибка создания ключа:', err));
+}
+
+function loadKeys() {
+    fetch('/api/v1/keys')
+    .then(r => r.json())
+    .then(data => {
+        keys = data.keys || [];
+        renderKeys();
+    })
+    .catch(err => console.error('Ошибка загрузки ключей:', err));
+}
+
+function renderKeys() {
+    const tbody = document.getElementById('keysList');
+    tbody.innerHTML = '';
+    
+    keys.forEach(key => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><code>${key.key}</code></td>
+            <td>${key.subscription}</td>
+            <td><span class="badge ${key.status === 'active' ? 'badge-success' : 'badge-danger'}">${key.status}</span></td>
+            <td>${new Date(key.created).toLocaleDateString()}</td>
+            <td>${key.usage_count}${key.usage_limit > 0 ? '/' + key.usage_limit : ''}</td>
+            <td>${key.comment || '-'}</td>
+            <td>
+                <button onclick="copyKey('${key.key}')">Копировать</button>
+                <button onclick="revokeKey('${key.key}')">Отозвать</button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function copyKey(key) {
+    navigator.clipboard.writeText(key).then(() => {
+        alert('Ключ скопирован в буфер обмена');
+    });
+}
+
+function revokeKey(key) {
+    if (!confirm('Отозвать ключ? Это действие необратимо.')) return;
+    
+    fetch('/api/v1/keys/' + key, {
+        method: 'DELETE'
+    })
+    .then(() => {
+        loadKeys();
+    })
+    .catch(err => console.error('Ошибка отзыва ключа:', err));
+}
+
+function exportKeys() {
+    const data = JSON.stringify(keys, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'neural_tunnel_keys.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+window.onload=()=>{ fetchChains(); refreshStats(); loadPorts(); loadFirewall(); loadBBR(); loadF2B(); refreshLogs(); refreshRegions(); loadKeys(); };
+</script>
+</body>
+</html>

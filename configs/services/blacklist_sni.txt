@@ -1,0 +1,57 @@
+# Черный список SNI доменов, которые часто блокируются
+# Социальные сети
+facebook.com
+www.facebook.com
+instagram.com
+www.instagram.com
+twitter.com
+x.com
+linkedin.com
+www.linkedin.com
+tiktok.com
+www.tiktok.com
+
+# Мессенджеры
+telegram.org
+web.telegram.org
+t.me
+whatsapp.com
+web.whatsapp.com
+signal.org
+
+# VPN и прокси
+nordvpn.com
+expressvpn.com
+protonvpn.com
+mullvad.net
+torproject.org
+www.torproject.org
+
+# Новостные
+bbc.com
+www.bbc.com
+cnn.com
+www.cnn.com
+dw.com
+www.dw.com
+reuters.com
+www.reuters.com
+
+# Стриминг
+netflix.com
+www.netflix.com
+hulu.com
+twitch.tv
+www.twitch.tv
+spotify.com
+
+# Файлообмен
+thepiratebay.org
+rutracker.org
+mega.nz
+
+# Крипто
+binance.com
+www.binance.com
+coinbase.com
+blockchain.com

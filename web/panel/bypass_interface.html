@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrafficMask NextGen - Обход с изменением страны</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .country-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .country-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .country-card.active {
+            border: 3px solid #28a745;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        .bypass-status {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .component-status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            margin: 2px;
+        }
+        .component-active {
+            background-color: #28a745;
+            color: white;
+        }
+        .component-inactive {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="fas fa-globe-americas"></i> TrafficMask NextGen - Обход с изменением страны
+            </span>
+            <div class="navbar-nav">
+                <span class="navbar-text" id="connection-status">
+                    <i class="fas fa-circle text-success"></i> Подключено
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Статистика системы -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card stats-card">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <i class="fas fa-chart-line"></i> Статистика системы обхода
+                        </h5>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 id="current-country">RU</h3>
+                                    <small>Текущая страна</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 id="success-rate">95.5%</h3>
+                                    <small>Успешность обхода</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 id="active-connections">10</h3>
+                                    <small>Активных соединений</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="text-center">
+                                    <h3 id="bytes-processed">156MB</h3>
+                                    <small>Обработано данных</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Выбор страны -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-flag"></i> Выбор страны для обхода
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="countries-container">
+                            <!-- Страны будут загружены динамически -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Компоненты обхода -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cogs"></i> Компоненты обхода
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="bypass-components">
+                            <!-- Компоненты будут загружены динамически -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Управление обходом -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shield-alt"></i> Управление обходом
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-success btn-lg" id="start-bypass">
+                                        <i class="fas fa-play"></i> Запустить обход
+                                    </button>
+                                    <button class="btn btn-danger btn-lg" id="stop-bypass">
+                                        <i class="fas fa-stop"></i> Остановить обход
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-grid gap-2">
+                                    <button class="btn btn-info btn-lg" id="test-connectivity">
+                                        <i class="fas fa-network-wired"></i> Тестировать подключение
+                                    </button>
+                                    <button class="btn btn-secondary btn-lg" id="refresh-stats">
+                                        <i class="fas fa-sync"></i> Обновить статистику
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Логи системы -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-terminal"></i> Логи системы
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="system-logs" style="height: 300px; overflow-y: auto; background: #1e1e1e; color: #00ff00; padding: 15px; border-radius: 5px; font-family: 'Courier New', monospace;">
+                            <div>[2024-10-04 18:30:15] Система обхода запущена</div>
+                            <div>[2024-10-04 18:30:16] Активация компонентов обхода</div>
+                            <div>[2024-10-04 18:30:17] SNI_Masking: Активирован (Успешность: 95.2%)</div>
+                            <div>[2024-10-04 18:30:18] IP_SIDR: Активирован (Успешность: 92.8%)</div>
+                            <div>[2024-10-04 18:30:19] Traffic_Obfuscation: Активирован (Успешность: 89.5%)</div>
+                            <div>[2024-10-04 18:30:20] Protocol_Masking: Активирован (Успешность: 94.1%)</div>
+                            <div>[2024-10-04 18:30:21] DPI_Bypass: Активирован (Успешность: 91.3%)</div>
+                            <div>[2024-10-04 18:30:22] Переключение на страну: RU</div>
+                            <div>[2024-10-04 18:30:23] Обход активен: Да</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Данные стран
+        const countries = {
+            'RU': { name: 'Россия', city: 'Moscow', flag: '🇷🇺', domains: ['vk.com', 'mail.ru', 'yandex.ru'] },
+            'US': { name: 'США', city: 'New York', flag: '🇺🇸', domains: ['google.com', 'microsoft.com', 'amazon.com'] },
+            'DE': { name: 'Германия', city: 'Berlin', flag: '🇩🇪', domains: ['google.de', 'amazon.de', 'ebay.de'] },
+            'FR': { name: 'Франция', city: 'Paris', flag: '🇫🇷', domains: ['google.fr', 'amazon.fr', 'lemonde.fr'] },
+            'GB': { name: 'Великобритания', city: 'London', flag: '🇬🇧', domains: ['google.co.uk', 'amazon.co.uk', 'bbc.co.uk'] }
+        };
+
+        // Компоненты обхода
+        const bypassComponents = {
+            'SNI_Masking': { name: 'SNI Маскировка', active: true, success_rate: 95.2 },
+            'IP_SIDR': { name: 'IP SIDR', active: true, success_rate: 92.8 },
+            'Traffic_Obfuscation': { name: 'Обфускация трафика', active: true, success_rate: 89.5 },
+            'Protocol_Masking': { name: 'Маскировка протокола', active: true, success_rate: 94.1 },
+            'DPI_Bypass': { name: 'Обход DPI', active: true, success_rate: 91.3 }
+        };
+
+        let currentCountry = 'RU';
+        let bypassActive = false;
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCountries();
+            loadBypassComponents();
+            startStatsUpdate();
+            startLogsUpdate();
+        });
+
+        // Загрузка стран
+        function loadCountries() {
+            const container = document.getElementById('countries-container');
+            container.innerHTML = '';
+
+            Object.entries(countries).forEach(([code, info]) => {
+                const countryCard = document.createElement('div');
+                countryCard.className = `col-md-2 mb-3`;
+                countryCard.innerHTML = `
+                    <div class="card country-card ${code === currentCountry ? 'active' : ''}" data-country="${code}">
+                        <div class="card-body text-center">
+                            <div style="font-size: 2em; margin-bottom: 10px;">${info.flag}</div>
+                            <h6>${info.name}</h6>
+                            <small>${info.city}</small>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(countryCard);
+
+                // Обработчик клика
+                countryCard.addEventListener('click', () => switchCountry(code));
+            });
+        }
+
+        // Загрузка компонентов обхода
+        function loadBypassComponents() {
+            const container = document.getElementById('bypass-components');
+            container.innerHTML = '';
+
+            Object.entries(bypassComponents).forEach(([id, component]) => {
+                const componentDiv = document.createElement('div');
+                componentDiv.className = 'mb-3';
+                componentDiv.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${component.name}</strong>
+                            <span class="component-status ${component.active ? 'component-active' : 'component-inactive'}">
+                                ${component.active ? 'Активен' : 'Неактивен'}
+                            </span>
+                        </div>
+                        <div>
+                            <span class="badge bg-primary">${component.success_rate}%</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(componentDiv);
+            });
+        }
+
+        // Переключение страны
+        function switchCountry(countryCode) {
+            if (countryCode === currentCountry) return;
+
+            console.log(`Переключение с ${currentCountry} на ${countryCode}`);
+            
+            // Обновление UI
+            document.querySelectorAll('.country-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            document.querySelector(`[data-country="${countryCode}"]`).classList.add('active');
+            
+            currentCountry = countryCode;
+            document.getElementById('current-country').textContent = countryCode;
+            
+            // Добавление лога
+            addLog(`Переключение на страну: ${countries[countryCode].name} (${countryCode})`);
+            
+            // Симуляция переключения
+            setTimeout(() => {
+                addLog(`Обход активен для ${countries[countryCode].name}`);
+                bypassActive = true;
+            }, 1000);
+        }
+
+        // Обработчики кнопок
+        document.getElementById('start-bypass').addEventListener('click', function() {
+            addLog('Запуск системы обхода...');
+            bypassActive = true;
+            addLog('Система обхода запущена успешно!');
+        });
+
+        document.getElementById('stop-bypass').addEventListener('click', function() {
+            addLog('Остановка системы обхода...');
+            bypassActive = false;
+            addLog('Система обхода остановлена');
+        });
+
+        document.getElementById('test-connectivity').addEventListener('click', function() {
+            addLog(`Тестирование подключения для ${countries[currentCountry].name}...`);
+            setTimeout(() => {
+                const success = Math.random() > 0.3;
+                addLog(`Подключение ${success ? 'успешно' : 'неудачно'}`);
+            }, 2000);
+        });
+
+        document.getElementById('refresh-stats').addEventListener('click', function() {
+            updateStats();
+            addLog('Статистика обновлена');
+        });
+
+        // Обновление статистики
+        function updateStats() {
+            document.getElementById('current-country').textContent = currentCountry;
+            document.getElementById('success-rate').textContent = (95 + Math.random() * 5).toFixed(1) + '%';
+            document.getElementById('active-connections').textContent = Math.floor(Math.random() * 10) + 5;
+            document.getElementById('bytes-processed').textContent = (Math.floor(Math.random() * 100) + 100) + 'MB';
+        }
+
+        // Автоматическое обновление статистики
+        function startStatsUpdate() {
+            setInterval(updateStats, 5000);
+        }
+
+        // Обновление логов
+        function startLogsUpdate() {
+            setInterval(() => {
+                if (bypassActive) {
+                    const messages = [
+                        'Обработка трафика...',
+                        'Анализ энтропии данных',
+                        'Маскировка SNI',
+                        'Обфускация IP',
+                        'Проверка DPI',
+                        'Обновление статистики'
+                    ];
+                    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+                    addLog(randomMessage);
+                }
+            }, 3000);
+        }
+
+        // Добавление лога
+        function addLog(message) {
+            const logsContainer = document.getElementById('system-logs');
+            const timestamp = new Date().toLocaleString('ru-RU');
+            const logEntry = document.createElement('div');
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>

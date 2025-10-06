@@ -1,0 +1,68 @@
+# Специальная конфигурация для обхода блокировки Telegram
+
+telegram:
+  # Метод обхода
+  bypass_method: "quantum_ws"  # quantum_ws, fake_tls, domain_fronting
+  
+  # Известные IP адреса Telegram
+  api_servers:
+    - "149.154.167.50"
+    - "149.154.167.51" 
+    - "149.154.167.91"
+    - "149.154.167.92"
+    - "149.154.175.50"
+    - "149.154.175.100"
+    
+  # MTProto proxy endpoints
+  mtproto_servers:
+    - "91.108.4.0/22"
+    - "91.108.8.0/22"
+    - "91.108.12.0/22"
+    - "91.108.16.0/22"
+    - "91.108.20.0/22"
+    - "91.108.56.0/22"
+    - "149.154.160.0/20"
+    
+  # Специальные настройки
+  settings:
+    # Фрагментация TLS для обхода DPI
+    tls_fragmentation:
+      enabled: true
+      fragment_size: 40  # байт
+      delay_between: 20  # мс
+      
+    # Имитация WebSocket
+    websocket_masking:
+      enabled: true
+      fake_origin: "web.telegram.org"
+      fake_user_agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      
+    # Domain fronting через CDN
+    domain_fronting:
+      enabled: true
+      front_domain: "www.google.com"
+      actual_sni: "core.telegram.org"
+      
+    # Обфускация протокола
+    protocol_obfuscation:
+      enabled: true
+      padding_min: 100
+      padding_max: 1400
+      fake_http_headers: true
+      
+# Автоматическое определение и адаптация
+auto_adapt:
+  enabled: true
+  probe_interval: 300  # секунд
+  
+  # Порядок попыток методов
+  method_priority:
+    1: "quantum_ws"      # Сначала пробуем квантовый WebSocket
+    2: "domain_fronting" # Потом domain fronting
+    3: "fake_tls"        # В крайнем случае fake TLS
+    
+  # Критерии переключения
+  switch_criteria:
+    packet_loss: 5       # % потерь для переключения
+    latency_increase: 200 # мс увеличения пинга
+    connection_failures: 3 # неудачных попыток

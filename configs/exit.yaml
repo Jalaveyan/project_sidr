@@ -1,0 +1,49 @@
+# NeuralTunnel Exit Point Configuration
+# VPS #2 - Точка выхода в интернет
+
+server:
+  role: "exit"
+  listen_port: 51820
+  listen_address: "0.0.0.0"
+  
+  # Квантовые функции
+  quantum:
+    enabled: true
+    bb84_enabled: true
+    qrng_enabled: true
+    
+# Цепочка серверов
+chain:
+  allowed_entry:
+    - "VPS1_IP_HERE"  # Замените на IP VPS #1
+    
+  routing:
+    exit_policy: "allow_all"
+    dns_servers:
+      - "1.1.1.1"
+      - "8.8.8.8"
+      
+# Сетевые оптимизации
+network:
+  bbr:
+    enabled: true
+  
+  nat:
+    enabled: true
+    masquerade: true
+    
+  fail2ban:
+    enabled: true
+    threshold: 10  # Выше порог для exit узла
+    ban_duration: 1800
+
+# Порты
+ports:
+  default:
+    - 51820
+  additional: []
+
+# Логирование
+logging:
+  level: "info"
+  file: "/var/log/neuraltunnel/exit.log"

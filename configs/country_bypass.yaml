@@ -1,0 +1,252 @@
+# TrafficMask NextGen - Конфигурация для обхода с изменением страны
+# Российская адаптация с AI-управлением
+
+# IPv4/IPv6 настройки
+ip_config:
+  version: "DUAL_STACK"
+  ipv4_address: "0.0.0.0"
+  ipv6_address: "::"
+  ipv4_port: 443
+  ipv6_port: 443
+  auto_detect: true
+  prefer_ipv6: false
+  
+  # Российские IP адреса для маскировки
+  ipv4_ranges:
+    - "77.88.8.8"      # Яндекс DNS
+    - "94.100.180.200" # Mail.ru
+    - "87.240.190.72"  # VK
+    - "81.19.70.1"     # Rambler
+    - "217.20.147.1"   # OK.ru
+  
+  # IPv6 адреса
+  ipv6_ranges:
+    - "2001:db8::1"
+    - "fe80::1"
+    - "::1"
+
+# Reverse Tunnel настройки
+reverse_tunnel:
+  local_endpoint: "127.0.0.1:8080"
+  remote_endpoint: "russia.example.com:443"
+  api_endpoint: "https://api.russia.example.com"
+  encryption_key: "russia_key_2024"
+  role_switch_delay_ms: 5000
+  auto_switch: true
+  ai_analysis: true
+
+# AI анализ
+ai_analysis:
+  enable_entropy_analysis: true
+  enable_mac_ip_analysis: true
+  enable_cdn_detection: true
+  enable_dpi_risk_assessment: true
+  enable_protocol_fingerprinting: true
+  enable_traffic_pattern_analysis: true
+  enable_sni_analysis: true
+  enable_ip_sidr_analysis: true
+  risk_threshold: 0.7
+  confidence_threshold: 0.8
+  analysis_interval_ms: 2000
+  history_size: 100
+
+# Динамический SNI
+dynamic_sni:
+  sni_pool:
+    - "vk.com"
+    - "mail.ru"
+    - "yandex.ru"
+    - "ok.ru"
+    - "rambler.ru"
+    - "rutracker.org"
+    - "gismeteo.ru"
+    - "1c.ru"
+  
+  russia_domains:
+    - "vk.com"
+    - "mail.ru"
+    - "yandex.ru"
+    - "ok.ru"
+    - "rambler.ru"
+    - "rutracker.org"
+    - "gismeteo.ru"
+    - "1c.ru"
+    - "habr.com"
+    - "tinkoff.ru"
+  
+  fallback_domains:
+    - "google.com"
+    - "microsoft.com"
+    - "amazon.com"
+    - "cloudflare.com"
+  
+  default_strategy: "AI_DRIVEN"
+  switch_interval_ms: 30000
+  scan_interval_ms: 60000
+  max_retries: 3
+  auto_scan: true
+  ai_analysis: true
+  success_threshold: 0.8
+
+# Управление соединениями
+connection_manager:
+  endpoint: "russia.example.com"
+  port: 443
+  type: "TCP"
+  priority: "HIGH"
+  timeout_ms: 30000
+  retry_count: 3
+  retry_delay_ms: 1000
+  auto_reconnect: true
+  ai_management: true
+  encryption_key: "russia_conn_key_2024"
+
+# Hysteria настройки
+hysteria:
+  server_address: "russia.example.com"
+  server_port: 443
+  auth_key: "russia_hysteria_key_2024"
+  obfs_password: "russia_obfs_2024"
+  bandwidth_mbps: 100
+  mtu: 1200
+  fast_open: true
+  congestion_control: true
+  congestion_algorithm: "bbr"
+  timeout_seconds: 30
+  retry_count: 3
+  auto_reconnect: true
+
+# Trojan настройки
+trojan:
+  server_address: "russia.example.com"
+  server_port: 443
+  password: "russia_trojan_pass_2024"
+  method: "aes-256-gcm"
+  obfs: "tls"
+  obfs_param: "russia_obfs_param"
+  sni: "vk.com"
+  alpn: "h2,http/1.1"
+  path: "/"
+  insecure: false
+  timeout_seconds: 30
+  retry_count: 3
+  auto_reconnect: true
+
+# DNS туннелирование
+dns_tunnel:
+  domain: "yandex.ru"
+  dns_server: "8.8.8.8"
+  tunnel_type: "TXT_RECORD"
+  chunk_size: 64
+  max_retries: 3
+  timeout_seconds: 30
+  compression: true
+  encryption: true
+  encryption_key: "russia_dns_key_2024"
+  obfuscation_method: "base32"
+  auto_reconnect: true
+
+# S3/YaDocs API
+api_integration:
+  type: "YADOCS"
+  endpoint: "docs.yandex.ru"
+  access_key: "russia_api_key_2024"
+  secret_key: "russia_secret_key_2024"
+  bucket_name: "russia-bucket"
+  region: "ru-east-1"
+  timeout_seconds: 30
+  max_retries: 3
+  encryption: true
+  encryption_key: "russia_api_encryption_2024"
+
+# Обход
+bypass:
+  bypass_type: "AI_DRIVEN"
+  sni_domains:
+    - "vk.com"
+    - "mail.ru"
+    - "yandex.ru"
+    - "ok.ru"
+    - "rambler.ru"
+    - "rutracker.org"
+    - "gismeteo.ru"
+    - "1c.ru"
+  
+  ip_ranges:
+    - "77.88.8.8"
+    - "94.100.180.200"
+    - "87.240.190.72"
+    - "81.19.70.1"
+    - "217.20.147.1"
+  
+  auto_detection: true
+  ai_optimization: true
+  detection_interval_ms: 5000
+  optimization_interval_ms: 30000
+  success_threshold: 0.8
+  failure_threshold: 0.3
+
+# VPS/CDN цепочки
+vps_cdn_chain:
+  chain_id: "russia_chain_2024"
+  name: "Russia Traffic Chain"
+  auto_optimization: true
+  load_balancing: true
+  failover_enabled: true
+  max_retries: 3
+  health_check_interval: 30.0
+  optimization_strategy: "ai_driven"
+  
+  # Российские VPS
+  vps_nodes:
+    - address: "vps1.russia.example.com"
+      port: 443
+      priority: 1
+      country: "RU"
+    - address: "vps2.russia.example.com"
+      port: 443
+      priority: 2
+      country: "RU"
+  
+  # Российские CDN
+  cdn_nodes:
+    - provider: "yandex"
+      endpoint: "cdn.yandex.ru"
+      priority: 1
+      country: "RU"
+    - provider: "mail"
+      endpoint: "cdn.mail.ru"
+      priority: 2
+      country: "RU"
+
+# Общие настройки
+general:
+  enable_all_features: true
+  russia_optimization: true
+  ai_management: true
+  startup_delay_ms: 2000
+  log_level: "INFO"
+  
+  # Настройки для изменения страны
+  country_switching:
+    enabled: true
+    target_countries: ["RU", "US", "DE", "FR", "GB"]
+    current_country: "RU"
+    switch_interval_minutes: 30
+    auto_switch: true
+    
+  # Геолокация
+  geolocation:
+    spoof_location: true
+    fake_country: "RU"
+    fake_city: "Moscow"
+    fake_region: "Moscow"
+    fake_timezone: "Europe/Moscow"
+    
+  # Обход блокировок
+  bypass_blocks:
+    dpi_bypass: true
+    sni_masking: true
+    ip_sidr_masking: true
+    traffic_obfuscation: true
+    protocol_masking: true

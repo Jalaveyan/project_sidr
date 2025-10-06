@@ -1,0 +1,85 @@
+{
+  "servers": [
+    {
+      "name": "local",
+      "url": "http://localhost:9090/metrics",
+      "type": "entry"
+    }
+  ],
+  "alerts": {
+    "qber_threshold": 0.11,
+    "cpu_threshold": 80,
+    "memory_threshold": 85,
+    "latency_threshold": 100,
+    "packet_loss_threshold": 5,
+    "connection_failures_threshold": 10
+  },
+  "database": "/var/lib/quantum-vpn/monitoring.db",
+  "webhook_url": null,
+  "retention_days": 30,
+  "monitoring_interval": 30,
+  "web_dashboard": {
+    "enabled": true,
+    "port": 8080,
+    "host": "0.0.0.0",
+    "auto_refresh": true,
+    "refresh_interval": 30
+  },
+  "metrics": {
+    "prometheus": {
+      "enabled": true,
+      "port": 9090,
+      "path": "/metrics"
+    },
+    "quantum": {
+      "enabled": true,
+      "bb84_metrics": true,
+      "ntru_metrics": true,
+      "qber_tracking": true
+    },
+    "network": {
+      "enabled": true,
+      "latency_tracking": true,
+      "packet_loss_tracking": true,
+      "throughput_tracking": true
+    },
+    "system": {
+      "enabled": true,
+      "cpu_tracking": true,
+      "memory_tracking": true,
+      "disk_tracking": true
+    },
+    "security": {
+      "enabled": true,
+      "threat_detection": true,
+      "anomaly_detection": true,
+      "audit_logging": true
+    }
+  },
+  "notifications": {
+    "email": {
+      "enabled": false,
+      "smtp_server": "smtp.gmail.com",
+      "smtp_port": 587,
+      "username": "",
+      "password": "",
+      "recipients": []
+    },
+    "webhook": {
+      "enabled": false,
+      "url": "",
+      "headers": {}
+    },
+    "telegram": {
+      "enabled": false,
+      "bot_token": "",
+      "chat_id": ""
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "/var/log/quantum-vpn/monitor.log",
+    "max_size": "100MB",
+    "backup_count": 5
+  }
+}

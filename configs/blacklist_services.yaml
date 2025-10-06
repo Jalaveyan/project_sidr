@@ -1,0 +1,13 @@
+# Blacklist candidate services (potentially blocked)
+# RU
+- rutracker.org
+- tjournal.ru
+- meduza.io
+# Abroad
+- telegram.org
+- tiktok.com
+- reddit.com
+- discord.com
+# IP examples
+- 149.154.167.99
+- 104.16.132.229

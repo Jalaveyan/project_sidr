@@ -1,0 +1,106 @@
+# NeuralTunnel Exit Point - Netherlands VPS
+# VPS #2 - Точка выхода в Нидерландах (Amsterdam)
+
+server:
+  role: "netherlands_exit"
+  listen_port: 443
+  listen_address: "0.0.0.0"
+  server_name: "NL Exit Point"
+  location: "Netherlands"
+  protocol: "vless"  # VLESS протокол
+  transport: "ws"    # WebSocket transport
+  path: "/neuraltunnel-exit"
+  
+  # Квантовые функции
+  quantum:
+    enabled: true
+    bb84_enabled: true
+    qrng_enabled: true
+    
+# Цепочка серверов
+chain:
+  mode: "exit"
+  allowed_entry:
+    - address: "RUSSIA_VPS_IP"  # Замените на IP VPS в России
+      country: "RU"
+      verify_quantum: true
+      
+  routing:
+    exit_policy: "allow_all"
+    dns_servers:
+      - "1.1.1.1"      # Cloudflare
+      - "8.8.8.8"      # Google
+      - "9.9.9.9"      # Quad9
+    
+    # Оптимизация для популярных сервисов
+    service_routes:
+      - service: "telegram"
+        optimize: true
+        direct: true
+      - service: "youtube"
+        optimize: true
+      - service: "instagram"
+        optimize: true
+        
+# Сетевые оптимизации
+network:
+  bbr:
+    enabled: true
+  
+  nat:
+    enabled: true
+    masquerade: true
+    
+  # IP forwarding
+  forwarding:
+    ipv4: true
+    ipv6: false
+    
+  fail2ban:
+    enabled: true
+    threshold: 10  # Мягче для exit узла
+    ban_duration: 1800
+    whitelist:
+      - "RUSSIA_VPS_IP"  # Всегда разрешаем РФ VPS
+
+# VLESS настройки
+vless:
+  uuid: "auto-generated"
+  encryption: "none"
+  flow: "xtls-rprx-vision"
+  
+  tls:
+    enabled: true
+    server_name: "www.cloudflare.com"
+    alpn:
+      - "h2"
+      - "http/1.1"
+    fingerprint: "chrome"
+    
+  websocket:
+    path: "/neuraltunnel-exit"
+    headers:
+      Host: "www.cloudflare.com"
+
+# Порты
+ports:
+  default:
+    - 443   # HTTPS (VLESS over TLS)
+  additional:
+    - 80    # HTTP (для редиректа)
+
+# Bandwidth management
+bandwidth:
+  limit_per_client: 100  # Mbps
+  total_limit: 1000      # Mbps
+  
+# Логирование
+logging:
+  level: "info"
+  file: "/var/log/neuraltunnel/netherlands_exit.log"
+  
+# Мониторинг
+monitoring:
+  enabled: true
+  report_to_panel: true
+  metrics_interval: 60

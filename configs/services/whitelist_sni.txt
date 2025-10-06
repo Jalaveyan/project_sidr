@@ -1,0 +1,71 @@
+# Белый список SNI доменов, которые обычно не блокируются
+# Google
+google.com
+www.google.com
+accounts.google.com
+mail.google.com
+drive.google.com
+docs.google.com
+play.google.com
+youtube.com
+www.youtube.com
+googlevideo.com
+
+# Microsoft
+microsoft.com
+www.microsoft.com
+login.microsoftonline.com
+outlook.live.com
+office.com
+teams.microsoft.com
+azure.microsoft.com
+windowsupdate.com
+
+# Apple
+apple.com
+www.apple.com
+icloud.com
+www.icloud.com
+itunes.apple.com
+
+# Amazon/AWS
+amazon.com
+www.amazon.com
+aws.amazon.com
+s3.amazonaws.com
+cloudfront.net
+
+# Cloudflare
+cloudflare.com
+www.cloudflare.com
+cloudflare-dns.com
+one.one.one.one
+cdn.cloudflare.net
+
+# Российские разрешенные
+yandex.ru
+www.yandex.ru
+mail.yandex.ru
+disk.yandex.ru
+sberbank.ru
+online.sberbank.ru
+vk.com
+m.vk.com
+mail.ru
+e.mail.ru
+
+# CDN и инфраструктура
+akamaihd.net
+akamaitechnologies.com
+fastly.net
+jsdelivr.net
+unpkg.com
+cdnjs.com
+
+# Образовательные
+wikipedia.org
+en.wikipedia.org
+ru.wikipedia.org
+coursera.org
+edx.org
+khanacademy.org
